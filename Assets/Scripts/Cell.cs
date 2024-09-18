@@ -21,5 +21,6 @@ public class Cell : MonoBehaviour
 public enum CellType
 {
     Road,
-    Land
+    Land,
+    Building
 }

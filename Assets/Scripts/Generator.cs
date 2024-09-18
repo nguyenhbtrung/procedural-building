@@ -7,8 +7,8 @@ public class Generator : MonoBehaviour
     [SerializeField] private int dimensions;
     [SerializeField] private int nRoad;
     [SerializeField] private GameObject cellPrefab;
-    [SerializeField] private GameObject roadPrefab;
     [SerializeField] private GameObject landPrefab;
+    [SerializeField] private GameObject buildingPrefab;
 
     private List<Cell> cells;
     private int maxTurns = 4;
@@ -44,38 +44,71 @@ public class Generator : MonoBehaviour
     {
         for (int i = 0; i < nRoad; i++)
         {
-            int nTurn = Random.Range(0, maxTurns) + 1;
-            int currentPosX = 0;
-            int currentPosY = 0;
-            GetRandomStartPos(ref currentPosX, ref currentPosY);
-            Cell startCell = GetCellAtPosition(currentPosX, currentPosY);
-            startCell.CellType = CellType.Road;
-
-            int turnCount = 0;
-            int stepCount = 0;
-            int nforwardStep = GetRandomRoadSteps();
-            int direction = GetNewDirection(currentPosX, currentPosY);
-            while (stepCount < dimensions * dimensions)
-            {
-                if (stepCount == nforwardStep && turnCount < nTurn)
-                {
-                    stepCount = 0;
-                    nforwardStep = GetRandomRoadSteps();
-                    direction = GetNewDirection(currentPosX, currentPosY);
-                    turnCount++;
-                }
-                GetNextPos(ref currentPosX, ref currentPosY, direction);
-                if (currentPosX < 0 || currentPosY < 0 || currentPosX >= dimensions || currentPosY >= dimensions)
-                {
-                    break;
-                }
-                Cell currentCell = GetCellAtPosition(currentPosX, currentPosY);
-                currentCell.CellType = CellType.Road;
-                stepCount++;
-            }
+            ProcessRoad();
             yield return null;
         }
+        ProcessBuilding();
         GenerateTiles();
+    }
+
+    private void ProcessRoad()
+    {
+        int nTurn = Random.Range(0, maxTurns) + 1;
+        int currentPosX = 0;
+        int currentPosY = 0;
+        GetRandomStartPos(ref currentPosX, ref currentPosY);
+        Cell startCell = GetCellAtPosition(currentPosX, currentPosY);
+        startCell.CellType = CellType.Road;
+
+        int turnCount = 0;
+        int stepCount = 0;
+        int nforwardStep = GetRandomRoadSteps();
+        int direction = GetNewDirection(currentPosX, currentPosY);
+        while (stepCount < dimensions * dimensions)
+        {
+            if (stepCount == nforwardStep && turnCount < nTurn)
+            {
+                stepCount = 0;
+                nforwardStep = GetRandomRoadSteps();
+                direction = GetNewDirection(currentPosX, currentPosY);
+                turnCount++;
+            }
+            GetNextPos(ref currentPosX, ref currentPosY, direction);
+            if (currentPosX < 0 || currentPosY < 0 || currentPosX >= dimensions || currentPosY >= dimensions)
+            {
+                break;
+            }
+            Cell currentCell = GetCellAtPosition(currentPosX, currentPosY);
+            currentCell.CellType = CellType.Road;
+            stepCount++;
+        }
+    }
+
+    public void ProcessBuilding()
+    {
+        foreach (Cell cell in cells)
+        {
+            if (cell.CellType == CellType.Road)
+            {
+                continue;
+            }
+            if (cell.X == 0 || cell.Y == 0 || cell.X == dimensions - 1 || cell.Y == dimensions - 1)
+            {
+                cell.CellType = CellType.Building;
+            }
+
+            Cell upCell = GetNeighbourCell(cell, NeighbourCell.Up);
+            Cell downCell = GetNeighbourCell(cell, NeighbourCell.Down);
+            Cell leftCell = GetNeighbourCell(cell, NeighbourCell.Left);
+            Cell rightCell = GetNeighbourCell(cell, NeighbourCell.Right);
+
+            bool hasNeighbourRoad = IsRoad(upCell) || IsRoad(downCell) || IsRoad(leftCell) || IsRoad(rightCell);
+
+            if (hasNeighbourRoad)
+            {
+                cell.CellType = CellType.Building;
+            }
+        }
     }
 
     public Cell GetCellAtPosition(int x, int y)
@@ -89,23 +122,27 @@ public class Generator : MonoBehaviour
         {
             if (cell.CellType == CellType.Road)
             {
-                Cell upCell = cells.Find(c => c.X == cell.X && c.Y == cell.Y + 1);
-                Cell downCell = cells.Find(c => c.X == cell.X && c.Y == cell.Y - 1);
-                Cell leftCell = cells.Find(c => c.X == cell.X - 1 && c.Y == cell.Y);
-                Cell rightCell = cells.Find(c => c.X == cell.X + 1 && c.Y == cell.Y);
+                Cell upCell = GetNeighbourCell(cell, NeighbourCell.Up);
+                Cell downCell = GetNeighbourCell(cell, NeighbourCell.Down);
+                Cell leftCell = GetNeighbourCell(cell, NeighbourCell.Left);
+                Cell rightCell = GetNeighbourCell(cell, NeighbourCell.Right);
 
-                bool isUpRoad = upCell == null || upCell.CellType == CellType.Road;
-                bool isDownRoad = downCell == null || downCell.CellType == CellType.Road;
-                bool isleftRoad = leftCell == null || leftCell.CellType == CellType.Road;
-                bool isRightRoad = rightCell == null || rightCell.CellType == CellType.Road;
-
-                GameObject roadPrefab = roadGenerator.GetRoadPrefabs(isUpRoad, isDownRoad, isleftRoad, isRightRoad);
+                GameObject roadPrefab = roadGenerator.GetRoadPrefabs(
+                    IsRoad(upCell), 
+                    IsRoad(downCell), 
+                    IsRoad(leftCell), 
+                    IsRoad(rightCell)
+                    );
 
                 Instantiate(roadPrefab, cell.transform.position, roadPrefab.transform.rotation);
             }
             else if (cell.CellType == CellType.Land)
             {
                 Instantiate(landPrefab, cell.transform.position, landPrefab.transform.rotation);
+            }
+            else if (cell.CellType == CellType.Building)
+            {
+                Instantiate(buildingPrefab, cell.transform.position, buildingPrefab.transform.rotation);
             }
         }
         //Destroy(gameObject);
@@ -169,5 +206,34 @@ public class Generator : MonoBehaviour
         return direction;
     }
     
+    public Cell GetNeighbourCell(Cell current, NeighbourCell neighbourCell)
+    {
+        switch (neighbourCell)
+        {
+            case NeighbourCell.Up:
+                return cells.Find(c => c.X == current.X && c.Y == current.Y + 1);
+            case NeighbourCell.Down:
+                return cells.Find(c => c.X == current.X && c.Y == current.Y - 1);
+            case NeighbourCell.Left:
+                return cells.Find(c => c.X == current.X - 1 && c.Y == current.Y);
+            case NeighbourCell.Right:
+                return cells.Find(c => c.X == current.X + 1 && c.Y == current.Y);
+            default:
+                return null;
+        }
+    }
 
+    public bool IsRoad(Cell cell)
+    {
+        return cell == null || cell.CellType == CellType.Road;
+    }
+
+}
+
+public enum NeighbourCell
+{
+    Up,
+    Down,
+    Left,
+    Right
 }
