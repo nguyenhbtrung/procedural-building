@@ -12,11 +12,13 @@ public class Generator : MonoBehaviour
 
     private List<Cell> cells;
     private int maxTurns = 4;
+    private RoadGenerator roadGenerator;
     
 
     private void Awake()
     {
         cells = new List<Cell>();
+        roadGenerator = GetComponent<RoadGenerator>();
         InitGrid();
     }
 
@@ -87,6 +89,18 @@ public class Generator : MonoBehaviour
         {
             if (cell.CellType == CellType.Road)
             {
+                Cell upCell = cells.Find(c => c.X == cell.X && c.Y == cell.Y + 1);
+                Cell downCell = cells.Find(c => c.X == cell.X && c.Y == cell.Y - 1);
+                Cell leftCell = cells.Find(c => c.X == cell.X - 1 && c.Y == cell.Y);
+                Cell rightCell = cells.Find(c => c.X == cell.X + 1 && c.Y == cell.Y);
+
+                bool isUpRoad = upCell == null || upCell.CellType == CellType.Road;
+                bool isDownRoad = downCell == null || downCell.CellType == CellType.Road;
+                bool isleftRoad = leftCell == null || leftCell.CellType == CellType.Road;
+                bool isRightRoad = rightCell == null || rightCell.CellType == CellType.Road;
+
+                GameObject roadPrefab = roadGenerator.GetRoadPrefabs(isUpRoad, isDownRoad, isleftRoad, isRightRoad);
+
                 Instantiate(roadPrefab, cell.transform.position, roadPrefab.transform.rotation);
             }
             else if (cell.CellType == CellType.Land)
