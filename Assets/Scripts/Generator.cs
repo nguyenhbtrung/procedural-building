@@ -13,12 +13,14 @@ public class Generator : MonoBehaviour
     private List<Cell> cells;
     private int maxTurns = 4;
     private RoadGenerator roadGenerator;
+    private BuildingGenerator buildingGenerator;
     
 
     private void Awake()
     {
         cells = new List<Cell>();
         roadGenerator = GetComponent<RoadGenerator>();
+        buildingGenerator = GetComponent<BuildingGenerator>();
         InitGrid();
     }
 
@@ -136,15 +138,18 @@ public class Generator : MonoBehaviour
 
                 Instantiate(roadPrefab, cell.transform.position, roadPrefab.transform.rotation);
             }
-            else if (cell.CellType == CellType.Land)
+            else if (cell.CellType == CellType.Land || cell.CellType == CellType.Building)
             {
                 Instantiate(landPrefab, cell.transform.position, landPrefab.transform.rotation);
             }
-            else if (cell.CellType == CellType.Building)
-            {
-                Instantiate(buildingPrefab, cell.transform.position, buildingPrefab.transform.rotation);
-            }
+
+            //else if (cell.CellType == CellType.Building)
+            //{
+            //    Instantiate(buildingPrefab, cell.transform.position, buildingPrefab.transform.rotation);
+            //}
+
         }
+        StartCoroutine(buildingGenerator.GenerateBuildings(cells));
         //Destroy(gameObject);
     }
 
