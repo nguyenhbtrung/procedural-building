@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
 public class BuildingGenerator : MonoBehaviour
 {
     [SerializeField] private List<GameObject> size1Buildings;
@@ -10,8 +11,11 @@ public class BuildingGenerator : MonoBehaviour
     [SerializeField] private List<GameObject> size3Buildings;
     [SerializeField] private int maxSize = 2;
 
-    public IEnumerator GenerateBuildings(List<Cell> cellsGrid)
+    private Transform buildingsParent;
+
+    public void GenerateBuildings(List<Cell> cellsGrid ,Transform buildingsParent)
     {
+        this.buildingsParent = buildingsParent;
         List<Cell> buildingCells = cellsGrid.Where(cell => cell.CellType == CellType.Building).ToList();
         List<Cell> usedCells = cellsGrid.Where(cell => cell.CellType == CellType.Road).ToList();
         foreach (Cell cell in buildingCells)
@@ -41,7 +45,7 @@ public class BuildingGenerator : MonoBehaviour
             {
                 GenerateSize1(cell, cellsGrid, usedCells); 
             }
-            yield return null;
+            //yield return null;
         }
     }
 
@@ -49,7 +53,7 @@ public class BuildingGenerator : MonoBehaviour
     {
         int buildingIndex = Random.Range(0, size1Buildings.Count);
         Quaternion buildingRot = CalculateBuildingRotation(current, cellsGrid);
-        Instantiate(size1Buildings[buildingIndex], current.transform.position, buildingRot);
+        Instantiate(size1Buildings[buildingIndex], current.transform.position, buildingRot, buildingsParent);
         usedCells.Add(current);
     }
 
@@ -78,7 +82,7 @@ public class BuildingGenerator : MonoBehaviour
             int buildingIndex = Random.Range(0, size2Buildings.Count);
             Vector3 buildingPos = (current.transform.position + considerCellList[1].transform.position) / 2.0f;
             Quaternion buildingRot = CalculateBuildingRotation(current, cellsGrid);
-            Instantiate(size2Buildings[buildingIndex], buildingPos, buildingRot);
+            Instantiate(size2Buildings[buildingIndex], buildingPos, buildingRot, buildingsParent);
             usedCells.Add(current);
             usedCells.AddRange(considerCellList);
             return true;
@@ -111,7 +115,7 @@ public class BuildingGenerator : MonoBehaviour
             int buildingIndex = Random.Range(0, size3Buildings.Count);
             Vector3 buildingPos = considerCellList[3].transform.position;
             Quaternion buildingRot = CalculateBuildingRotation(current, cellsGrid);
-            Instantiate(size3Buildings[buildingIndex], buildingPos, buildingRot);
+            Instantiate(size3Buildings[buildingIndex], buildingPos, buildingRot, buildingsParent);
             usedCells.Add(current);
             usedCells.AddRange(considerCellList);
             return true;

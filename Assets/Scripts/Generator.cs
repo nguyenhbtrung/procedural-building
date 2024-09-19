@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class Generator : MonoBehaviour
 {
     [SerializeField] private int dimensions;
@@ -14,14 +15,24 @@ public class Generator : MonoBehaviour
     private int maxTurns = 4;
     private RoadGenerator roadGenerator;
     private BuildingGenerator buildingGenerator;
+    private Transform area;
+    private static int areaID = 0;
     
 
-    private void Awake()
+    //private void Awake()
+    //{
+    //    if (!Application.isPlaying) return;
+    //    Initialize();
+    //    InitGrid();
+    //}
+
+    public void Initialize()
     {
+        if (area != null)
+            DestroyImmediate(area.gameObject);
         cells = new List<Cell>();
         roadGenerator = GetComponent<RoadGenerator>();
         buildingGenerator = GetComponent<BuildingGenerator>();
-        InitGrid();
     }
 
     public void InitGrid()
@@ -35,19 +46,21 @@ public class Generator : MonoBehaviour
                     .GetComponent<Cell>();
                 newCell.X = x; 
                 newCell.Y = y;
+                newCell.CellType = CellType.Land;
                 cells.Add(newCell);
             }
         }
 
-        StartCoroutine(CalculateTilesData());
+        //StartCoroutine(CalculateTilesData());
+        CalculateTilesData();
     }
 
-    public IEnumerator CalculateTilesData()
+    public void CalculateTilesData()
     {
         for (int i = 0; i < nRoad; i++)
         {
             ProcessRoad();
-            yield return null;
+            //yield return null;
         }
         ProcessBuilding();
         GenerateTiles();
@@ -120,6 +133,8 @@ public class Generator : MonoBehaviour
 
     public void GenerateTiles()
     {
+        Transform parent = new GameObject($"Area_{areaID:00}").GetComponent<Transform>();
+        area = parent;
         foreach (Cell cell in cells)
         {
             if (cell.CellType == CellType.Road)
@@ -136,11 +151,11 @@ public class Generator : MonoBehaviour
                     IsRoad(rightCell)
                     );
 
-                Instantiate(roadPrefab, cell.transform.position, roadPrefab.transform.rotation);
+                Instantiate(roadPrefab, cell.transform.position, roadPrefab.transform.rotation, parent);
             }
             else if (cell.CellType == CellType.Land || cell.CellType == CellType.Building)
             {
-                Instantiate(landPrefab, cell.transform.position, landPrefab.transform.rotation);
+                Instantiate(landPrefab, cell.transform.position, landPrefab.transform.rotation, parent);
             }
 
             //else if (cell.CellType == CellType.Building)
@@ -149,7 +164,12 @@ public class Generator : MonoBehaviour
             //}
 
         }
-        StartCoroutine(buildingGenerator.GenerateBuildings(cells));
+        //StartCoroutine(buildingGenerator.GenerateBuildings(cells));
+        buildingGenerator.GenerateBuildings(cells, parent);
+        foreach (Cell cell in cells)
+        {
+            DestroyImmediate(cell.gameObject);
+        }
         //Destroy(gameObject);
     }
 
@@ -233,6 +253,12 @@ public class Generator : MonoBehaviour
         return cell == null || cell.CellType == CellType.Road;
     }
 
+    public void ApplyArea()
+    {
+        Debug.Log($"{area.name} has been applied");
+        areaID++;
+        area = null;
+    }
 }
 
 public enum NeighbourCell
