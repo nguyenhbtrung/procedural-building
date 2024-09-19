@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
 public class Generator : MonoBehaviour
 {
+    [SerializeField] private bool showMesh = true;
     [SerializeField] private bool customSize = false;
     [SerializeField] private int dimensions;
     [SerializeField] private int nRoad;
@@ -19,7 +21,8 @@ public class Generator : MonoBehaviour
     private BuildingGenerator buildingGenerator;
     private Transform area;
     private static int areaID = 0;
-    
+    private bool needMeshUpdate = false;
+
 
     //private void Awake()
     //{
@@ -27,6 +30,25 @@ public class Generator : MonoBehaviour
     //    Initialize();
     //    InitGrid();
     //}
+    private void OnValidate()
+    {
+        needMeshUpdate = true;
+        EditorApplication.delayCall += UpdateMeshVisibility;
+    }
+
+    private void UpdateMeshVisibility()
+    {
+        if (!needMeshUpdate)
+        {
+            return;
+        }
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+            meshRenderer.enabled = showMesh;
+        }
+        needMeshUpdate = false;
+    }
 
     public void Initialize()
     {
@@ -35,6 +57,9 @@ public class Generator : MonoBehaviour
         cells = new List<Cell>();
         roadGenerator = GetComponent<RoadGenerator>();
         buildingGenerator = GetComponent<BuildingGenerator>();
+        showMesh = false;
+        needMeshUpdate = true;
+        UpdateMeshVisibility();
     }
 
     public void InitGrid()
