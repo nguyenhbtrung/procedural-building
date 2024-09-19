@@ -7,6 +7,7 @@ public class Generator : MonoBehaviour
 {
     [SerializeField] private int dimensions;
     [SerializeField] private int nRoad;
+    [SerializeField] private int scale = 20;
     [SerializeField] private GameObject cellPrefab;
     [SerializeField] private GameObject landPrefab;
     [SerializeField] private GameObject buildingPrefab;
@@ -41,7 +42,10 @@ public class Generator : MonoBehaviour
         {
             for (int x = 0; x < dimensions; x++)
             {
-                Vector3 position = new Vector3(x * 20, 0, y * 20);
+                float posX = transform.position.x + (x - dimensions / 2) * scale;
+                float posZ = transform.position.z + (y - dimensions / 2) * scale;
+                float posY = transform.position.y;
+                Vector3 position = new Vector3(posX, posY, posZ);
                 Cell newCell = Instantiate(cellPrefab, position, Quaternion.identity, this.transform)
                     .GetComponent<Cell>();
                 newCell.X = x; 

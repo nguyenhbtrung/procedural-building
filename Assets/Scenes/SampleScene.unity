@@ -468,6 +468,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dimensions: 50
   nRoad: 13
+  scale: 20
   cellPrefab: {fileID: 6905636063554332749, guid: f7ae0e416410e7648a613d2d8c951be2, type: 3}
   landPrefab: {fileID: 100000, guid: b74c48c2e73e17c418c9394124b75daf, type: 3}
   buildingPrefab: {fileID: 1334400213604728437, guid: 34ce4f7b94164994b8fda97e97cbbb6d, type: 3}
