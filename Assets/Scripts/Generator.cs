@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class Generator : MonoBehaviour
 {
+    [SerializeField] private bool customSize = false;
     [SerializeField] private int dimensions;
     [SerializeField] private int nRoad;
     [SerializeField] private int scale = 20;
@@ -38,6 +39,7 @@ public class Generator : MonoBehaviour
 
     public void InitGrid()
     {
+        Resize();
         for (int y = 0; y < dimensions; y++)
         {
             for (int x = 0; x < dimensions; x++)
@@ -48,7 +50,7 @@ public class Generator : MonoBehaviour
                 Vector3 position = new Vector3(posX, posY, posZ);
                 Cell newCell = Instantiate(cellPrefab, position, Quaternion.identity, this.transform)
                     .GetComponent<Cell>();
-                newCell.X = x; 
+                newCell.X = x;
                 newCell.Y = y;
                 newCell.CellType = CellType.Land;
                 cells.Add(newCell);
@@ -57,6 +59,17 @@ public class Generator : MonoBehaviour
 
         //StartCoroutine(CalculateTilesData());
         CalculateTilesData();
+    }
+
+    private void Resize()
+    {
+        if (customSize)
+        {
+            return;
+        }
+        float size = Mathf.Min(transform.localScale.x, transform.localScale.y);
+        dimensions = (int)size / scale;
+        nRoad = (dimensions / 4) + 1;
     }
 
     public void CalculateTilesData()
