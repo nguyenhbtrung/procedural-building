@@ -92,6 +92,10 @@ public class Generator : MonoBehaviour
         {
             return;
         }
+        if (transform.localScale.x != transform.localScale.y)
+        {
+            Debug.LogWarning("Scale X and Y should be equal.");
+        }
         float size = Mathf.Min(transform.localScale.x, transform.localScale.y);
         dimensions = (int)size / scale;
         nRoad = (dimensions / 4) + 1;
