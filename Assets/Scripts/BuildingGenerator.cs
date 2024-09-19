@@ -63,7 +63,7 @@ public class BuildingGenerator : MonoBehaviour
         {
             bool isValid = true;
             List<Cell> considerCellList = new List<Cell>();
-            for (int j = 0; j < size2ConsiderNeighbour.GetLength(1) - 1; j++)
+            for (int j = 0; j < size2ConsiderNeighbour.GetLength(1); j++)
             {
                 int x = current.X + size2ConsiderNeighbour[i, j, 0];
                 int y = current.Y + size2ConsiderNeighbour[i, j, 1];
@@ -96,7 +96,7 @@ public class BuildingGenerator : MonoBehaviour
         {
             bool isValid = true;
             List<Cell> considerCellList = new List<Cell>();
-            for (int j = 0; j < size3ConsiderNeighbour.GetLength(1) - 1; j++)
+            for (int j = 0; j < size3ConsiderNeighbour.GetLength(1); j++)
             {
                 int x = current.X + size3ConsiderNeighbour[i, j, 0];
                 int y = current.Y + size3ConsiderNeighbour[i, j, 1];
@@ -150,22 +150,18 @@ public class BuildingGenerator : MonoBehaviour
 
     private int[,,] size3ConsiderNeighbour =
     {
-        { { -1, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 0, 180 } },
-        { { -1, 0 }, { 1, 0 }, { -1, -1 }, { 0, -1}, { 1, -1}, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 0, 0 } },
-        { { 0, 1 }, { 0, -1 }, { -1, 1 }, { -1 , 0 }, { -1, -1 }, { -2, 1}, { -2, 0 }, { -2, -1 }, { 0, 90 } },
-        { { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 2, 1 }, { 2, 0 }, { 2, -1 }, { 0, 270 } }
+        { { -1, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { -1, 2 }, { 0, 2 }, { 1, 2 } },
+        { { -1, 0 }, { 1, 0 }, { -1, -1 }, { 0, -1}, { 1, -1}, { -1, -2 }, { 0, -2 }, { 1, -2 } },
+        { { 0, 1 }, { 0, -1 }, { -1, 1 }, { -1 , 0 }, { -1, -1 }, { -2, 1}, { -2, 0 }, { -2, -1 } },
+        { { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 2, 1 }, { 2, 0 }, { 2, -1 } }
     };
 
     private int[,,] size2ConsiderNeighbour =
     {
-        { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 0, 180 } },
-        { { 1, 0 }, { 1, 1 }, { 0, 1 }, { 0, 180 } },
-        { { -1, 0 }, { -1, -1 }, { 0, -1 }, { 0, 0 } },
-        { { 1, 0 }, { 1, -1 }, { 0, -1 }, { 0, 0 } },
-        { { 0, 1 }, { -1, 1 }, { -1, 0 }, { 0, 90 } },
-        { { 0, -1 }, { -1, -1 }, { -1, 0 }, { 0, 90 } },
-        { { 0, 1 }, { 1, 1 }, { 1, 0 }, { 0, 270 } },
-        { { 0, -1 }, { 1, -1 }, { 1, 0 }, { 0, 270 } }
+        { { -1, 0 }, { -1, 1 }, { 0, 1 } },
+        { { 1, 0 }, { 1, 1 }, { 0, 1 } },
+        { { -1, 0 }, { -1, -1 }, { 0, -1 } },
+        { { 1, 0 }, { 1, -1 }, { 0, -1 } },
     };
 
 }
