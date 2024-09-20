@@ -6,7 +6,9 @@ Welcome to the **Procedural Building** project!
 
 Package is now available.
 
-Download package at: https://drive.google.com/drive/folders/1q93USAczIKemirVoeJ-nv1Y7BB5G_4ct?usp=drive_link
+Download the latest version in the release section.
+
+Or choose other versions at: https://drive.google.com/drive/folders/1q93USAczIKemirVoeJ-nv1Y7BB5G_4ct?usp=drive_link
 
 ## Latest Version
 
