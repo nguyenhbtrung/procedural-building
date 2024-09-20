@@ -38,7 +38,7 @@ public class Generator : MonoBehaviour
 
     private void UpdateMeshVisibility()
     {
-        if (!needMeshUpdate)
+        if (!needMeshUpdate || this == null)
         {
             return;
         }
